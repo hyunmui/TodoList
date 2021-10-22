@@ -1,0 +1,55 @@
+@page "/todo"
+
+<h1>Todo (@todos.Count(todo => !todo.IsDone))</h1>
+
+<form class="col-lg-6 col-md-8 p-0">
+
+<ul>
+    @foreach (var todo in todos)
+    {
+        <li class="d-flex align-items-center mb-2">
+            @if (todo.IsEditMode)
+            {
+                <input type="checkbox" class="form-check-input" @bind="todo.IsDone" disabled />
+                <input class="form-control" @bind="todo.Title" style="flex-grow: 1; margin-right: 10px;" />
+                <button type="button" class="btn btn-success" @onclick="todo.Confirm" style="margin-right: 5px;">Save</button>
+                <button type="button" class="btn btn-danger" @onclick="todo.ToggleEditMode">Cancel</button>
+            }
+            else 
+            {
+                <input type="checkbox" class="form-check-input" @bind="todo.IsDone" />
+                <span @attributes="GetTodoAttributes(todo)">@todo.Title</span>
+                <button type="button" class="btn btn-primary" @onclick="todo.ToggleEditMode"
+                    style="flex-shrink: 0">Edit</button>
+            }
+        </li>
+    }
+</ul>
+
+<div class="d-flex">
+    <input class="form-control" type="text" placeholder="Something todo" @bind="newTodo">
+    <button type="button" class="btn btn-dark" @onclick="AddTodo" style="flex-shrink: 0; flex-grow: 1; margin-left: 10px;">Add todo</button>
+</div>
+
+</form>
+
+@code {
+    private List<TodoItem> todos = new ();
+    private string newTodo;
+
+    private void AddTodo()
+    {
+        if (!string.IsNullOrWhiteSpace(newTodo)) 
+        {
+            todos.Add(new TodoItem { Title = newTodo });
+            newTodo = string.Empty;
+        }
+    }
+
+    Dictionary<string, object> GetTodoAttributes(TodoItem todo)
+    {
+        var dict = new Dictionary<string, object>();
+        dict.Add("style", "flex-grow: 1;" + (todo.IsDone ? "text-decoration: line-through;" : ""));
+        return dict;
+    }
+}
